@@ -19,3 +19,12 @@ This project is organized as follows:
 - `setup_project.sh`: Script to set up the project environment (optional).
 
 Each directory contains a README.md file that further explains the contents
+
+## Configuration
+
+Before running the application, you need to create a `config.ini` file based on the provided template:
+
+1. Copy `config.ini.example` to a new file named `config.ini`:
+
+```bash
+cp config.ini.example config.ini
