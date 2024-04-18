@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import os
 import configparser
-
+print("hey")
 # Initialize the ConfigParser object
 config = configparser.ConfigParser()
 
