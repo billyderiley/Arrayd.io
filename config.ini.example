@@ -1,2 +1,2 @@
-[Paths]
+[DEFAULT]
 ItunesLibraryPath = path/to/your/iTunes/Library.xml
