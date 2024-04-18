@@ -54,6 +54,9 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# Test Data Example
+iTunes_Music_Library_Example.xml
+
 # Translations
 *.mo
 *.pot
