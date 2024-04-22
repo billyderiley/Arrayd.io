@@ -2,48 +2,48 @@ from dotenv import load_dotenv
 import os
 from auth import SpotifyAuthClient
 from user_data import UserData
+from populate_data import create_tracks_dataframe
 from playlist_data import PlaylistData
-from history_data import HistoryData
-from util import format_artist_names
+from save_user_playlist_data_to_csv import save_dataframe_to_csv
+
 
 # Load environment variables
 load_dotenv()
 
+def print_summary(user_profile, user_playlists):
+    print("_" * 80)
+    print("User Summary")
+    print("-" * 80)
+    print(f"Name: {user_profile['display_name']}")
+    print(f"UserID: {user_profile['id']}")
+    for playlist in user_playlists['items']:
+        print(f"Playlist Name: {playlist['name']} | Playlist ID: {playlist['id']} | Tracks: {playlist['tracks']['total']}")
+    print("_" * 80)
+
 def main():
-    # Read environment variables
-    client_id = os.getenv('SPOTIFY_CLIENT_ID')
-    client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
-    redirect_uri = os.getenv('SPOTIFY_REDIRECT_URI')
-    
-    # Scope defines what access we have to the user's data
-    scope = 'user-library-read user-top-read playlist-read-private user-read-recently-played'
-
     # Initialize the SpotifyAuthClient
-    spotify_auth_client = SpotifyAuthClient(client_id, client_secret, redirect_uri, scope)
-    #spotify_client = spotify_auth_client.get_client()
-    try:
-        spotify_client = spotify_auth_client.get_client()
-        # Continue with the existing setup...
-    except Exception as e:
-        print(f"Error initializing Spotify client: {str(e)}")
-    
+    spotify_auth_client = SpotifyAuthClient()
+    spotify_client = spotify_auth_client.get_client()
 
-    # Instance of UserData to fetch user profile and data
+    # Fetch user data and print summary
     user_data = UserData(spotify_client)
     user_profile = user_data.get_user_profile()
-    print(f"User Profile: {user_profile}")
 
-    # Instance of PlaylistData to fetch user's playlists
+    # Initialize PlaylistData to fetch user's playlists
     playlist_data = PlaylistData(spotify_client)
     user_playlists = playlist_data.get_user_playlists()
-    print(f"User's Playlists: {[playlist['name'] for playlist in user_playlists['items']]}")
 
-    # Instance of HistoryData to fetch recently played tracks
-    history_data = HistoryData(spotify_client)
-    recently_played = history_data.get_recently_played_tracks()
-    print("Recently Played Tracks:")
-    for track in recently_played:
-        print(f" - {track['track']['name']} by {format_artist_names(track['track']['artists'])}")
+    # Print summary
+    print_summary(user_profile, user_playlists)
+
+    # Populate DataFrame with track data
+    tracks_df = create_tracks_dataframe(spotify_client)
+    # For demo purposes, print the DataFrame shape and first few rows
+    print(f"DataFrame Shape: {tracks_df.shape}")
+    #print(tracks_df.head())
+
+    # Now save the DataFrame to CSV
+    save_dataframe_to_csv(tracks_df)
 
 if __name__ == '__main__':
     main()
