@@ -4,7 +4,7 @@ import pandas as pd
 
 def main():
     # Assume the DataFrame has been loaded from the CSV
-    df = pd.read_csv('../../data/users_tracks_and_playlists.csv')
+    df = pd.read_csv('data/users_tracks_and_playlists.csv')
     total_tracks = len(df)
     
     
