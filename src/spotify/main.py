@@ -20,7 +20,13 @@ def main():
 
     # Initialize the SpotifyAuthClient
     spotify_auth_client = SpotifyAuthClient(client_id, client_secret, redirect_uri, scope)
-    spotify_client = spotify_auth_client.get_client()
+    #spotify_client = spotify_auth_client.get_client()
+    try:
+        spotify_client = spotify_auth_client.get_client()
+        # Continue with the existing setup...
+    except Exception as e:
+        print(f"Error initializing Spotify client: {str(e)}")
+    
 
     # Instance of UserData to fetch user profile and data
     user_data = UserData(spotify_client)

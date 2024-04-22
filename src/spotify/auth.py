@@ -1,29 +1,33 @@
-from spotipy.oauth2 import SpotifyOAuth
 import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 
 class SpotifyAuthClient:
     def __init__(self, client_id, client_secret, redirect_uri, scope):
-        self.sp_oauth = SpotifyOAuth(
-            client_id=client_id,
-            client_secret=client_secret,
-            redirect_uri=redirect_uri,
-            scope=scope,
-            cache_path=".cache-" + client_id  # This is optional but useful for not having to re-authenticate on every run.
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.redirect_uri = redirect_uri
+        self.scope = scope
+        self.sp_auth = self.create_spotify_oauth()
+
+    def create_spotify_oauth(self):
+        return SpotifyOAuth(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            redirect_uri=self.redirect_uri,
+            scope=self.scope
         )
 
-    def get_auth_url(self):
-        return self.sp_oauth.get_authorize_url()
+    def get_client(self):
+        # Ensure token_info is a dictionary
+        token_info = self.sp_auth.get_cached_token()
+        if not token_info:
+            token_info = self.sp_auth.get_access_token(as_dict=True)  # Make sure this returns a dictionary
+        if 'access_token' in token_info:
+            return spotipy.Spotify(auth=token_info['access_token'])
+        else:
+            raise Exception("Failed to retrieve access token.")
 
-    def authenticate_user(self, code):
-        # Exchanges the code for a token and caches the token
-        token_info = self.sp_oauth.get_access_token(code)
-        return spotipy.Spotify(auth=token_info['access_token'])
-
-# The following code is meant to be run interactively:
-# auth_client = SpotifyAuthClient('your_client_id', 'your_client_secret', 'your_redirect_uri', 'required_scope')
-# auth_url = auth_client.get_auth_url()
-# print(f"Please navigate here in your browser: {auth_url}")
-# print("Please enter the URL you were redirected to after authorizing the app:")
-# response_url = input()
-# code = auth_client.sp_oauth.parse_response_code(response_url)
-# spotify_client = auth_client.authenticate_user(code)
+# You can create a function that initializes this client with the actual credentials
+def initialize_spotify_client(client_id, client_secret, redirect_uri, scope):
+    auth_client = SpotifyAuthClient(client_id, client_secret, redirect_uri, scope)
+    return auth_client.get_client()
