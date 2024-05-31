@@ -7,4 +7,4 @@ __all__ = ['authenticate', 'user_data', 'playlist_data', 'track_data', 'history_
 from .auth import SpotifyAuthClient
 
 # Initialize a SpotifyAuthClient for use in other modules within this package
-spotify_auth_client = SpotifyAuthClient(client_id='your_client_id', client_secret='your_client_secret')
+spotify_auth_client = SpotifyAuthClient()
