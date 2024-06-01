@@ -1,5 +1,8 @@
 import torchaudio
 import torchaudio.transforms as transforms
+import numpy as np
+# Set numpy print options to increase threshold for truncation
+np.set_printoptions(threshold=np.inf)
 
 def extract_audio_features(audio_buffer):
     waveform, sample_rate = torchaudio.load(audio_buffer,format='mp3')
@@ -20,4 +23,7 @@ def extract_audio_features(audio_buffer):
     )
     
     mel_spectrogram = mel_spectrogram_transform(waveform)
+    print("Waveform is : ", waveform)
+    print("Shape of waveoform: ", waveform.shape)
+    print("Shape of Mel ", mel_spectrogram.shape)
     return mel_spectrogram
