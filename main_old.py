@@ -1,6 +1,6 @@
 #from src.spotify.main import main as spotify_main
 import src.spotify.main as spotify_main
-from src.audio_analysis.main import run_audio_analysis
+from src.data_processing.main import run_audio_analysis
 #from src.audio_analysis.
 
 def main():

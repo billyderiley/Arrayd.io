@@ -23,7 +23,4 @@ def extract_audio_features(audio_buffer):
     )
     
     mel_spectrogram = mel_spectrogram_transform(waveform)
-    print("Waveform is : ", waveform)
-    print("Shape of waveoform: ", waveform.shape)
-    print("Shape of Mel ", mel_spectrogram.shape)
     return mel_spectrogram

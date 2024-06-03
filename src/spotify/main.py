@@ -32,6 +32,16 @@ def main():
     # Initialize PlaylistData to fetch user's playlists
     playlist_data = PlaylistData(spotify_client)
     user_playlists = playlist_data.get_user_playlists()
+    # Configurable exclusion criteria
+    exclude_names = ["Crate Digging", "Latest"]
+    max_tracks = 500
+    # Fetch playlists with exclusions
+    user_playlists = playlist_data.get_user_playlists(limit=20, exclude_names=exclude_names, max_tracks=max_tracks)
+    
+    for playlist in user_playlists['items']:
+        print(f"Playlist: {playlist['name']} has {playlist['tracks']['total']} tracks")
+
+
 
     # Print summary
     print_summary(user_profile, user_playlists)
