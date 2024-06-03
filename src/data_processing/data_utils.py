@@ -27,10 +27,10 @@ class AudioDataset(Dataset):
         return feature_tensor, label_tensor
 
     def encode_labels(self, playlist_ids):
-        labels = np.zeros(len(self.playlist_dict))
-        indices = [self.playlist_dict[id] for id in playlist_ids.split(';') if id in self.playlist_dict]
+        labels = np.zeros(len(self.playlist_to_idx))
+        indices = [self.playlist_to_idx[id] for id in playlist_ids.split(';') if id in self.playlist_to_idx]
         labels[indices] = 1
-        return labels
+        return torch.tensor(labels, dtype=torch.float32)
 """
     def __getitem__(self, idx):
         row = self.data_frame.iloc[idx]
@@ -55,12 +55,7 @@ def load_data(csv_path):
     df = pd.read_csv(csv_path)
     return df
 
-def create_dataloader(df, batch_size=32, shuffle=True):
-    """Create a DataLoader from a DataFrame and calculate the total number of batches."""
-    unique_playlists = df['in_playlist_ids'].unique()
-    playlist_to_idx = {pid: idx for idx, pid in enumerate(unique_playlists)}
+def create_dataloader(df, playlist_to_idx, batch_size=32, shuffle=True):
+    """Create a DataLoader from a DataFrame."""
     dataset = AudioDataset(df, playlist_to_idx)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
-    total_batches = (len(dataset) + batch_size - 1) // batch_size  # Calculate total number of batches
-    return dataloader, total_batches
-
+    return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle), len(dataset)

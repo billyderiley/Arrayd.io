@@ -8,8 +8,8 @@ from torch.nn import CrossEntropyLoss
 
 def train_model(dataloader, input_size, num_classes):
     model = get_model(input_size, num_classes)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    loss_fn = torch.nn.CrossEntropyLoss()
+    optimizer = Adam(model.parameters(), lr=0.001)
+    loss_fn = BCEWithLogitsLoss()
 
     for features, labels in dataloader:
         optimizer.zero_grad()
@@ -28,3 +28,6 @@ class MultiLabelModel(nn.Module):
     
     def forward(self, x):
         return torch.sigmoid(self.fc(x))  # Sigmoid for binary classification per label
+
+def get_model(input_size, num_classes):
+    return MultiLabelModel(input_size, num_classes)
