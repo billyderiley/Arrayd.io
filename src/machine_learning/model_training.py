@@ -4,7 +4,7 @@ from model import get_model
 
 from torch import nn
 from torch.optim import Adam
-from torch.nn import CrossEntropyLoss
+from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
 
 def train_model(dataloader, input_size, num_classes):
     model = get_model(input_size, num_classes)
