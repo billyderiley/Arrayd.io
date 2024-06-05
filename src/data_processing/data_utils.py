@@ -59,3 +59,14 @@ def create_dataloader(df, playlist_to_idx, batch_size=32, shuffle=True):
     """Create a DataLoader from a DataFrame."""
     dataset = AudioDataset(df, playlist_to_idx)
     return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle), len(dataset)
+
+def num_of_classes_from_unique_playlists(df):
+    all_playlists = set()
+    def update_unique(value):
+        id = value.split(";")
+        all_playlists.update(id)
+    df['in_playlist_ids'].apply(update_unique)
+    unique_count = len(all_playlists)
+    print(f'Number of unique classes will be {unique_count}, matching the  number of unique playlist ids')
+    return unique_count, all_playlists
+
