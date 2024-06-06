@@ -10,8 +10,7 @@ def get_waveform_samplerate_mp3(audio_buffer):
 
 def extract_audio_features(audio_buffer):
     waveform, sample_rate = get_waveform_samplerate_mp3(audio_buffer=audio_buffer)
-    duration = waveform.shape[1] / sample_rate
-    print("duration is, ", duration)
+    
     # Assuming a default FFT size might be too low, let's increase it
     n_fft = 2048  # Increasing FFT size
     win_length = None  # you can also set this as needed

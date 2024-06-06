@@ -1,7 +1,15 @@
+import sys
+sys.path.append(r'/workspaces/Arrayd.io')
+
 import pandas as pd
 from playlist_data import PlaylistData
+from spotify_utils import check_download_duration
+from src.data_processing.download_previews import download_preview
 
-def create_tracks_dataframe(spotify_client, include_no_preview=False):
+from src.storage_access.sql_utils import update_database
+from src.storage_access.file_storage import store_download
+
+def create_tracks_dataframe(spotify_client, store_entries=True, include_no_preview=False):
     playlist_data = PlaylistData(spotify_client)
     user_playlists = playlist_data.get_user_playlists()
 
@@ -25,8 +33,13 @@ def create_tracks_dataframe(spotify_client, include_no_preview=False):
         # Add track data to the DataFrame
         for track_item in playlist_tracks['items']:
             track = track_item['track']
+            track_id = track['id']
             if track['preview_url'] or include_no_preview:  # Check if preview_url exists or include tracks without preview
-                track_id = track['id']
+                audio_buffer, error = download_preview(track_id, track['preview_url'])
+                duration = check_download_duration(audio_buffer)
+                if duration != 29.71265306122449:
+                    print("duration is not the accepted nuber, skipping. Duration : ", duration, " ID : ", track_id)
+                    continue
                 track_details = {
                     'track_id': track_id,
                     'name': track['name'],
@@ -45,6 +58,9 @@ def create_tracks_dataframe(spotify_client, include_no_preview=False):
                 else:
                     new_row = pd.DataFrame([track_details], columns=tracks_df.columns)
                     tracks_df = pd.concat([tracks_df, new_row], ignore_index=True)
+                    if store_entries is True:
+                        file_path = store_download(audio_buffer, track_id)
+                        update_database(track_id, file_path)
 
     print("\nFinished loading playlists.")  # New line after progress completion
     return tracks_df

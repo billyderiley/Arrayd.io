@@ -23,6 +23,7 @@ class AudioDataset(Dataset):
         features = extract_audio_features(audio_buffer)
         audio_buffer.close()
         feature_tensor = torch.tensor(features.numpy().flatten(), dtype=torch.float32)
+        #print(f"feature size is {feature_tensor.size()}")
         label_tensor = self.encode_labels(row['in_playlist_ids'])
         return feature_tensor, label_tensor
 
