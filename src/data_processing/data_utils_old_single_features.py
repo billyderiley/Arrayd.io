@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
 from src.data_processing.download_previews import download_preview
-from src.data_processing.audio_feature_extraction import extract_audio_features
+from src.data_processing.audio_feature_extraction import extract_audio_features, extract_mutiple_audio_features
 from src.storage_access.file_storage import check_track_id_has_30_second_preview_downloaded, retrieve_download
 import numpy as np
 
@@ -65,6 +65,11 @@ def create_dataloader(df, playlist_to_idx, batch_size=32, shuffle=True):
     dataset = AudioDataset(df, playlist_to_idx)
     return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle), len(dataset)
 
+def create_dataloader_multi_features(df, playlist_to_idx, batch_size=32, shuffle=True):
+    """Create a DataLoader from a DataFrame."""
+    dataset = AudioDatasetMultiFeatures(df, playlist_to_idx)
+    return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle), len(dataset)
+
 def num_of_classes_from_unique_playlists(df):
     all_playlists = set()
     def update_unique(value):
@@ -75,3 +80,27 @@ def num_of_classes_from_unique_playlists(df):
     print(f'Number of unique classes will be {unique_count}, matching the  number of unique playlist ids')
     return unique_count, all_playlists
 
+
+class AudioDatasetMultiFeatures(Dataset):
+    def __init__(self, data_frame):
+        self.data_frame = data_frame
+    
+    def __len__(self):
+        return len(self.data_frame)
+    
+    def __getitem__(self, idx):
+        row = self.data_frame.iloc[idx]
+        preview_url = row['preview_url']
+        track_id = row['track_id']
+        if check_track_id_has_30_second_preview_downloaded(track_id) is True:
+            audio_buffer = retrieve_download(track_id)
+            close_buffer = False
+        else:
+            audio_buffer, error = download_preview(row['track_id'], preview_url)
+            close_buffer = True
+        mutiple_features = extract_mutiple_audio_features(audio_buffer)
+        audio_buffer.close() if close_buffer is True else None
+        feature_tensor = torch.tensor(mutiple_features, dtype=torch.float32)
+        label_tensor = self.encode_labels(row['in_playlist_ids'])
+        
+        return feature_tensor, label_tensor

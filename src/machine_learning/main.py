@@ -19,17 +19,13 @@ def main():
 
     print(f"Number of unique playlists: {num_classes}")
 
-    # Create a dictionary for playlist to index mapping
-    playlist_to_idx = {playlist_id: idx for idx, playlist_id in enumerate(all_playlists)}
+    dataloader, total_batches, dataset = create_dataloader(df)
 
-    dataloader, total_batches = create_dataloader(df, playlist_to_idx)
-    
-    # Correctly set input size based on your actual data processing
-    input_size = 655360  # Updated based on actual feature size
+    # Infer the input size dynamically
+    input_size = dataset.infer_input_size()
+    print(f"Inferred input size: {input_size}")
 
-    # Call train_model with the entire dataloader
     model = train_model(dataloader, input_size, num_classes)
-
     print("\nTraining completed.")
 
 if __name__ == "__main__":

@@ -31,3 +31,28 @@ class MultiLabelModel(nn.Module):
 
 def get_model(input_size, num_classes):
     return MultiLabelModel(input_size, num_classes)
+
+def train_model_multif_features(dataloader, input_size, num_classes):
+    model = get_model(input_size, num_classes)
+    optimizer = Adam(model.parameters(), lr=0.0001)  # Reduced learning rate
+    loss_fn = BCEWithLogitsLoss()
+
+    for features, labels in dataloader:
+        optimizer.zero_grad()
+        
+        outputs = model(features)
+        assert torch.isfinite(outputs).all(), "Model outputs contain NaNs or Infs"
+
+        loss = loss_fn(outputs, labels)
+        assert torch.isfinite(loss).all(), "Loss contains NaNs or Infs"
+
+        loss.backward()
+
+        # Clip gradients to prevent exploding gradients
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+        
+        optimizer.step()
+
+        print(f"Loss: {loss.item()}")
+    
+    return model
