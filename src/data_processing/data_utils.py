@@ -3,6 +3,7 @@ from torch.utils.data import Dataset, DataLoader
 import pandas as pd
 from src.data_processing.download_previews import download_preview
 from src.data_processing.audio_feature_extraction import extract_audio_features
+from src.storage_access.file_storage import check_track_id_has_30_second_preview_downloaded, retrieve_download
 import numpy as np
 
 class AudioDataset(Dataset):
@@ -16,12 +17,15 @@ class AudioDataset(Dataset):
     def __getitem__(self, idx):
         row = self.data_frame.iloc[idx]
         preview_url = row['preview_url']
-        audio_buffer, error = download_preview(row['track_id'], preview_url)
-        if error:
-            print(f"Error downloading audio for track ID {row['track_id']}: {error}")
-            return torch.tensor([]), row['in_playlist_ids']
+        track_id = row['track_id']
+        if check_track_id_has_30_second_preview_downloaded(track_id) is True:
+            audio_buffer = retrieve_download(track_id)
+            close_buffer = False
+        else:
+            audio_buffer, error = download_preview(row['track_id'], preview_url)
+            close_buffer = True
         features = extract_audio_features(audio_buffer)
-        audio_buffer.close()
+        audio_buffer.close() if close_buffer is True else None
         feature_tensor = torch.tensor(features.numpy().flatten(), dtype=torch.float32)
         #print(f"feature size is {feature_tensor.size()}")
         label_tensor = self.encode_labels(row['in_playlist_ids'])
