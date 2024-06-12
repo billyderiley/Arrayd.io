@@ -44,15 +44,15 @@ class AudioDataset(Dataset):
                 print(f"Error downloading audio for track ID {track_id}: {error}")
                 return torch.tensor([]), torch.tensor([])  # Handle error by returning empty tensors
 
-        waveform, sample_rate = extract_audio_features(audio_buffer)
+        #waveform, sample_rate = extract_audio_features(audio_buffer)
 
         # Extract different features
         feature_list = []
         if 'mel_spectrogram' in self.features:
-            mel_spec = extract_audio_features(audio_buffer)
+            mel_spec = extract_mel_spec(audio_buffer)
             feature_list.append(mel_spec.numpy().flatten())
         if 'spectral_centroid' in self.features:
-            spectral_centroid = extract_spectral_centroid(waveform, sample_rate)
+            spectral_centroid = extract_spectral_centroid(audio_buffer)
             feature_list.append(spectral_centroid.numpy().flatten())
         
         # Concatenate all features
@@ -82,14 +82,14 @@ class AudioDataset(Dataset):
             if error:
                 raise ValueError(f"Error downloading audio for track ID {track_id}: {error}")
 
-        waveform, sample_rate = extract_audio_features(audio_buffer)
+        #waveform, sample_rate = extract_audio_features(audio_buffer)
         
         feature_list = []
         if 'mel_spectrogram' in self.features:
             mel_spec = extract_mel_spec(audio_buffer)
             feature_list.append(mel_spec.numpy().flatten())
         if 'spectral_centroid' in self.features:
-            spectral_centroid = extract_spectral_centroid(waveform, sample_rate)
+            spectral_centroid = extract_spectral_centroid(audio_buffer)
             feature_list.append(spectral_centroid.numpy().flatten())
 
         input_size = np.concatenate(feature_list).shape[0]
@@ -106,3 +106,13 @@ def create_dataloader(df, batch_size=32, shuffle=True):
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     total_batches = len(dataloader)
     return dataloader, total_batches, dataset
+
+def num_of_classes_from_unique_playlists(df):
+    all_playlists = set()
+    def update_unique(value):
+        id = value.split(";")
+        all_playlists.update(id)
+    df['in_playlist_ids'].apply(update_unique)
+    unique_count = len(all_playlists)
+    print(f'Number of unique classes will be {unique_count}, matching the  number of unique playlist ids')
+    return unique_count, all_playlists

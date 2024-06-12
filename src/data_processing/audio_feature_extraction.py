@@ -11,7 +11,11 @@ def get_waveform_samplerate_mp3(audio_buffer):
 def extract_audio_features(audio_buffer, feature_type : str):
     waveform, sample_rate = get_waveform_samplerate_mp3(audio_buffer=audio_buffer)
     #feature = extract_mel_spec(waveform, sample_rate)
-    feature = extract_spectral_centroid(waveform, sample_rate) if feature_type == 'Mel' else 'SpectralCentroid' if feature_type = 'SpectralCentroid'
+    
+    if feature_type == 'Mel':
+        feature = extract_mel_spec(waveform, sample_rate)
+    elif feature_type == 'SpectralCentroid':
+        feature = extract_spectral_centroid(waveform, sample_rate)
     return feature
 
 def extract_mutiple_audio_features(audio_buffer):
@@ -23,8 +27,6 @@ def extract_mutiple_audio_features(audio_buffer):
     mel_spectrogram_flat = mel_spectrogram.numpy().flatten()
     spectral_centroid_flat = spectral_centroid.numpy().flatten()
     combined_features = np.concatenate([mel_spectrogram_flat, spectral_centroid_flat])
-
-
 
 def extract_mel_spec(audio_buffer):
     waveform, sample_rate = get_waveform_samplerate_mp3(audio_buffer)
