@@ -32,22 +32,28 @@ def main():
     # Initialize PlaylistData to fetch user's playlists
     playlist_data = PlaylistData(spotify_client)
     user_playlists = playlist_data.get_user_playlists()
+    print("All user playlists: ")
+    print_summary(user_profile, user_playlists)
+    #for playlist in user_playlists['items']:
+    #    print(playlist['name'])
     # Configurable exclusion criteria
     exclude_names = ["Crate Digging", "Latest"]
-    max_tracks = 500
+    max_tracks = 1000
+    limit = None
     # Fetch playlists with exclusions
-    user_playlists = playlist_data.get_user_playlists(limit=20, exclude_names=exclude_names, max_tracks=max_tracks)
+    #user_playlists_with_exclusions = playlist_data.get_user_playlists(limit=limit, exclude_names=exclude_names, max_tracks=max_tracks)
+    filtered_playlists = playlist_data.filter_user_playlists(user_playlists, exclude_names=exclude_names, max_tracks=max_tracks)
     
-    for playlist in user_playlists['items']:
+    for playlist in filtered_playlists['items']:
         print(f"Playlist: {playlist['name']} has {playlist['tracks']['total']} tracks")
 
-
-
     # Print summary
-    print_summary(user_profile, user_playlists)
+    print("User playlists included: ")
+    print_summary(user_profile, filtered_playlists)
 
     # Populate DataFrame with track data
-    tracks_df = create_tracks_dataframe(spotify_client)
+    #tracks_df = create_tracks_dataframe(spotify_client=spotify_client, limit=max_playlists, exclude_names=exclude_names, max_tracks=max_tracks)
+    tracks_df = create_tracks_dataframe(filtered_playlists, spotify_client)
     # For demo purposes, print the DataFrame shape and first few rows
     print(f"DataFrame Shape: {tracks_df.shape}")
     #print(tracks_df.head())

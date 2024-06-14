@@ -1,9 +1,6 @@
 import sys
 sys.path.append(r'/workspaces/Arrayd.io')
-
 import os
-from src.data_processing.download_previews import download_preview
-from src.data_processing.audio_feature_extraction import extract_audio_features
 from src.data_processing.data_utils import load_data, create_dataloader, num_of_classes_from_unique_playlists
 from model_training import train_model
 from dotenv import load_dotenv

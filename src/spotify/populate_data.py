@@ -9,9 +9,11 @@ from src.data_processing.download_previews import download_preview
 from src.storage_access.sql_utils import update_database
 from src.storage_access.file_storage import store_download
 
-def create_tracks_dataframe(spotify_client, store_entries=True, include_no_preview=False):
-    playlist_data = PlaylistData(spotify_client)
-    user_playlists = playlist_data.get_user_playlists()
+#def create_tracks_dataframe(spotify_client, limit, store_entries=True, include_no_preview=False, exclude_names=None, max_tracks=None):
+def create_tracks_dataframe(user_playlists, spotify_client, store_entries=True, include_no_preview=False):
+    #playlist_data = PlaylistData(spotify_client)
+    #user_playlists = playlist_data.get_user_playlists(limit, exclude_names=exclude_names, max_tracks=max_tracks)
+
 
     total_playlists = len(user_playlists['items'])  # Total number of playlists to process
 
@@ -24,7 +26,7 @@ def create_tracks_dataframe(spotify_client, store_entries=True, include_no_previ
     # Iterate over user's playlists and their tracks
     for index, playlist in enumerate(user_playlists['items'], start=1):
         playlist_id = playlist['id']
-        playlist_tracks = playlist_data.get_playlist_tracks(playlist_id)
+        playlist_tracks = PlaylistData(spotify_client).get_playlist_tracks(playlist_id)
 
         # Print progress
         progress = (index / total_playlists) * 100  # Calculate progress as a percentage

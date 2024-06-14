@@ -18,6 +18,11 @@ spectral_centroid_scaler = StandardScaler()
 def normalize_features(features, scaler):
     # Reshape to (num_samples, num_features) if necessary
     reshaped_features = features.reshape(-1, features.shape[-1])
+    #Check for NaN or infinite values
+    if np.isnan(reshaped_features).any() or np.isinf(reshaped_features).any():
+        print("Warning: Invalid values found in features before normalization.")
+        #reshaped_features = np.nan_to_num(reshaped_features)  # Replace NaNs with zero and inf with finite numbers
+        raise ValueError("Nan or Zero occured")
     normalized_features = scaler.fit_transform(reshaped_features)
     return normalized_features.reshape(features.shape)
 

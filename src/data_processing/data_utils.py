@@ -2,7 +2,6 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
 from src.data_processing.download_previews import download_preview
-from src.data_processing.audio_feature_extraction import extract_audio_features
 from src.data_processing.audio_feature_extraction import extract_spectral_centroid, extract_mel_spec
 from src.storage_access.file_storage import check_track_id_has_30_second_preview_downloaded, retrieve_download
 import numpy as np
@@ -10,7 +9,6 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
 from src.data_processing.download_previews import download_preview
-from src.data_processing.audio_feature_extraction import extract_audio_features
 from src.data_processing.audio_feature_extraction import extract_spectral_centroid
 from src.storage_access.file_storage import check_track_id_has_30_second_preview_downloaded, retrieve_download
 import numpy as np
@@ -35,7 +33,7 @@ class AudioDataset(Dataset):
         row = self.data_frame.iloc[idx]
         preview_url = row['preview_url']
         track_id = row['track_id']
-        
+        print(row['track_id'], row['name'], row['artists'])
         if check_track_id_has_30_second_preview_downloaded(track_id):
             audio_buffer = retrieve_download(track_id)
         else:
