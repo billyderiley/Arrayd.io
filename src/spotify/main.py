@@ -16,8 +16,12 @@ def print_summary(user_profile, user_playlists):
     print("-" * 80)
     print(f"Name: {user_profile['display_name']}")
     print(f"UserID: {user_profile['id']}")
+    print("Number of playlists in total: ", len(user_playlists['items']))
+    counter = 0
     for playlist in user_playlists['items']:
         print(f"Playlist Name: {playlist['name']} | Playlist ID: {playlist['id']} | Tracks: {playlist['tracks']['total']}")
+        counter+=1
+        print(counter)
     print("_" * 80)
 
 def main():
@@ -42,7 +46,8 @@ def main():
     limit = None
     # Fetch playlists with exclusions
     #user_playlists_with_exclusions = playlist_data.get_user_playlists(limit=limit, exclude_names=exclude_names, max_tracks=max_tracks)
-    filtered_playlists = playlist_data.filter_user_playlists(user_playlists, exclude_names=exclude_names, max_tracks=max_tracks)
+    print(exclude_names, len(exclude_names))
+    filtered_playlists = playlist_data.filter_user_playlists(user_playlists, exclude_names, max_tracks)
     
     for playlist in filtered_playlists['items']:
         print(f"Playlist: {playlist['name']} has {playlist['tracks']['total']} tracks")

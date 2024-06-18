@@ -6,10 +6,20 @@ class PlaylistData:
 
     def get_user_playlists(self, limit=None, offset=None):
         """Fetch user playlists with optional exclusion filters."""
-        playlists = self.spotify_client.current_user_playlists(limit=limit, offset=offset)
-        return playlists
+        #limit = 50 if not lim
+        #offset = 0
+        user_playlists = []
+        next_page = self.spotify_client.current_user_playlists()
+        # Fetch all pages
+        while next_page:
+            user_playlists.extend(next_page['items'])
+            next_page = self.spotify_client.next(next_page)  # Get the next page if it exists
+        #playlists = self.spotify_client.current_user_playlists(limit=limit, offset=offset)
     
-    def filter_user_playlists(playlists, exclude_names=None, max_tracks=None):
+        print("is this the total nuber of playlists? ")
+        return user_playlists
+    
+    def filter_user_playlists(self, playlists, exclude_names, max_tracks):
         """Filter playlists based on the provided criteria"""
         filtered_playlists = []
         exclude_names = exclude_names or []
