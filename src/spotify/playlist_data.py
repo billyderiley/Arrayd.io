@@ -19,12 +19,13 @@ class PlaylistData:
         print("is this the total nuber of playlists? ")
         return user_playlists
     
-    def filter_user_playlists(self, playlists, exclude_names, max_tracks):
+    def filter_user_playlists(self, playlists, exclude_names, min_tracks=5, max_tracks=1000):
         """Filter playlists based on the provided criteria"""
         filtered_playlists = []
         exclude_names = exclude_names or []
 
-        for playlist in playlists['items']:
+        #for playlist in playlists['items']:
+        for playlist in playlists:
             # Check for name exclusions
             if any(exclude_name.lower() in playlist['name'].lower() for exclude_name in exclude_names):
                 print("excluding ", playlist['name'])
@@ -32,12 +33,14 @@ class PlaylistData:
             else:
                 print("including ", playlist['name'])
             # Check for maximum track count
-            if max_tracks is not None and playlist['tracks']['total'] > max_tracks:
+            #if max_tracks is not None and playlist['tracks']['total'] > max_tracks:
+            if playlist['tracks']['total'] < min_tracks or playlist['tracks']['total'] > max_tracks:
                 continue
             filtered_playlists.append(playlist)
         
         # Return the filtered playlists in the original format
-        return {'items': filtered_playlists}
+        #return {'items': filtered_playlists}
+        return filtered_playlists
 
     def get_playlist_tracks(self, playlist_id, limit=None, offset=None):
         return self.spotify_client.playlist_tracks(playlist_id, limit=limit, offset=offset)

@@ -10,7 +10,7 @@ from torch.utils.data import Dataset, DataLoader
 import pandas as pd
 from src.data_processing.download_previews import download_preview
 from src.data_processing.audio_feature_extraction import extract_spectral_centroid
-from src.storage_access.file_storage import check_track_id_has_30_second_preview_downloaded, retrieve_download
+from src.storage_access.file_storage import check_track_id_has_30_second_preview_downloaded, retrieve_download, store_download
 import numpy as np
 
 class AudioDataset(Dataset):
@@ -41,6 +41,8 @@ class AudioDataset(Dataset):
             if error:
                 print(f"Error downloading audio for track ID {track_id}: {error}")
                 return torch.tensor([]), torch.tensor([])  # Handle error by returning empty tensors
+            #store_download(audio_buffer, track_id)
+            
 
         #waveform, sample_rate = extract_audio_features(audio_buffer)
 

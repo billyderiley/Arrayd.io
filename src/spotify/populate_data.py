@@ -15,7 +15,8 @@ def create_tracks_dataframe(user_playlists, spotify_client, store_entries=True, 
     #user_playlists = playlist_data.get_user_playlists(limit, exclude_names=exclude_names, max_tracks=max_tracks)
 
 
-    total_playlists = len(user_playlists['items'])  # Total number of playlists to process
+    #total_playlists = len(user_playlists['items'])  # Total number of playlists to process
+    total_playlists = len(user_playlists)  # Total number of playlists to process
 
     # Initialize the DataFrame
     tracks_df = pd.DataFrame(columns=[
@@ -24,7 +25,8 @@ def create_tracks_dataframe(user_playlists, spotify_client, store_entries=True, 
     ])
 
     # Iterate over user's playlists and their tracks
-    for index, playlist in enumerate(user_playlists['items'], start=1):
+    #for index, playlist in enumerate(user_playlists['items'], start=1):
+    for index, playlist in enumerate(user_playlists, start=1):
         playlist_id = playlist['id']
         playlist_tracks = PlaylistData(spotify_client).get_playlist_tracks(playlist_id)
 

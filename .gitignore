@@ -8,6 +8,7 @@ __pycache__/
 
 # Development
 setup_project.sh
+bot_detection.py
 
 # Distribution / packaging
 .Python
