@@ -7,7 +7,7 @@ from spotify_utils import check_download_duration
 from src.data_processing.download_previews import download_preview
 
 from src.storage_access.sql_utils import update_database
-from src.storage_access.file_storage import store_download
+from src.storage_access.file_storage import retrieve_download, store_download, check_track_id_has_30_second_preview_downloaded
 
 #def create_tracks_dataframe(spotify_client, limit, store_entries=True, include_no_preview=False, exclude_names=None, max_tracks=None):
 def create_tracks_dataframe(user_playlists, spotify_client, store_entries=True, include_no_preview=False):
@@ -39,7 +39,13 @@ def create_tracks_dataframe(user_playlists, spotify_client, store_entries=True, 
             track = track_item['track']
             track_id = track['id']
             if track['preview_url'] or include_no_preview:  # Check if preview_url exists or include tracks without preview
-                audio_buffer, error = download_preview(track_id, track['preview_url'])
+                if check_track_id_has_30_second_preview_downloaded(track_id):
+                    audio_buffer = retrieve_download(track_id)
+                else:
+                    audio_buffer, error = download_preview(track_id, track['preview_url'])
+                    if store_entries:
+                        file_path = store_download(audio_buffer, track_id)
+                        update_database(track_id, file_path)
                 duration = check_download_duration(audio_buffer)
                 if duration != 29.71265306122449:
                     print("duration is not the accepted nuber, skipping. Duration : ", duration, " ID : ", track_id)
@@ -62,9 +68,9 @@ def create_tracks_dataframe(user_playlists, spotify_client, store_entries=True, 
                 else:
                     new_row = pd.DataFrame([track_details], columns=tracks_df.columns)
                     tracks_df = pd.concat([tracks_df, new_row], ignore_index=True)
-                    if store_entries is True:
-                        file_path = store_download(audio_buffer, track_id)
-                        update_database(track_id, file_path)
+                    #if store_entries is True:
+                    #    file_path = store_download(audio_buffer, track_id)
+                    #    update_database(track_id, file_path)
 
     print("\nFinished loading playlists.")  # New line after progress completion
     return tracks_df
